@@ -58,7 +58,7 @@ gulp.task('minify-js', function (done) {
 
 // 压缩图片
 gulp.task('minify-images', function() {
-    return gulp.src('.*.ico', 'src/img/*.*')
+    return gulp.src('*.ico', 'src/img/*.*')
         .pipe(imagemin(
         [imagemin.gifsicle({'optimizationLevel': 3}),
         imagemin.optipng({'optimizationLevel': 7}),
