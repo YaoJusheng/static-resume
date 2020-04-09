@@ -8,7 +8,17 @@ var htmlmin     = require('gulp-htmlmin');
 var htmlclean   = require('gulp-htmlclean');
 var babel       = require('gulp-babel');
 var uglify      = require('gulp-uglify');
+var imagemin    = require('gulp-imagemin');
 
+
+// Static server
+gulp.task('browser-sync', function() {
+    browserSync.init({
+        server: {
+            baseDir: './public/'
+        }
+    });
+});
 
 // 压缩html
 gulp.task('minify-html', function() {
@@ -24,46 +34,50 @@ gulp.task('minify-html', function() {
   done();
 });
 
-// Static server
-gulp.task('browser-sync', function() {
-    browserSync.init({
-        server: {
-            baseDir: './'
-        }
-    });
-});
-
-
 // Build css files
 gulp.task('compressCSS', function() {
-  return gulp.src(['src/css/*.scss','./lib/*.css'])
+  return gulp.src(['src/css/*.scss','src/css/*.css'])
         .pipe(sass())
         .pipe(prefix(['last 15 versions', '> 1%', 'ie 8', 'ie 7'], { cascade: true }))
         .pipe(minifyCSS())
         .pipe(rename({
             suffix: '.min'
         }))
-        .pipe(gulp.dest('./public/css/'))
+        .pipe(gulp.dest('./public/src/css/'))
         .pipe(browserSync.stream());
   done();
 });
 
-// ??js??
+// 压缩 js
 gulp.task('minify-js', function (done) {
-  return gulp.src(['./lib/*.js'])
-      // .pipe(babel({
-      //     //?ES6?????????JS??
-      //     presets: ['es2015'] // es5????
-      // }))
+  return gulp.src(['src/js/*.js'])
       .pipe(uglify())
-      .pipe(gulp.dest('./public/js/'));
+      .pipe(gulp.dest('./public/src/js/'));
   done();
 });
+
+// 压缩图片
+gulp.task('minify-images', function() {
+    return gulp.src('.*.ico', 'src/img/*.*')
+        .pipe(imagemin(
+        [imagemin.gifsicle({'optimizationLevel': 3}),
+        imagemin.optipng({'optimizationLevel': 7}),
+        imagemin.svgo()],
+        {'verbose': true}))
+        .pipe(gulp.dest('./public/src/images'))
+});
+
 
 gulp.task('cname', function (done) {
   return gulp.src(['./CNAME'])
       .pipe(uglify())
       .pipe(gulp.dest('./public/'));
+  done();
+});
+
+gulp.task('font', function (done) {
+  return gulp.src(['./font/*'])
+      .pipe(gulp.dest('./public/font'));
   done();
 });
 
@@ -78,7 +92,7 @@ gulp.task('watch', function () {
 // Default task, running just `gulp` will move font, compress js and scss, start server, watch files.
 // gulp.task('default', ['compressCSS', 'browser-sync', 'watch']);
 
-gulp.task('default',gulp.series(gulp.parallel('compressCSS','minify-js', 'browser-sync', 'watch', 'cname', 'minify-html')), function () {
+gulp.task('default',gulp.series(gulp.parallel('compressCSS','minify-js', 'minify-images', 'font', 'watch', 'cname', 'minify-html', 'browser-sync')), function () {
   console.log("----------gulp Finished----------");
   // Do something after a, b, and c are finished.
 });

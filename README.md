@@ -22,6 +22,21 @@ $ npm install -g gulp
 $ gulp
 ```
 
+## Deploy
+1. 手动上传文件
+    
+```
+将生成的目标文件public/*上传到你的web服务器上。
+```
+    
+2. 命令部署
+
+新建gh-pages分支后，执行：
+
+```bash
+npm run deploy
+```
+
 可能出现的问题及解决方法：
 - [Node-sass v3.13.1 ... Not Found解决方法](https://github.com/SharePoint/sp-dev-fx-webparts/issues/501)
 
